@@ -43,7 +43,6 @@ class _DomainDashboardState extends State<DomainDashboard> {
     }
   }
 
-
   Future<void> _saveSettings({String? token, String? name, String? apiUrl}) async {
     final prefs = await SharedPreferences.getInstance();
     if (token != null) await prefs.setString('api_token', token);
@@ -60,34 +59,28 @@ class _DomainDashboardState extends State<DomainDashboard> {
     }
   }
 
-
   Future<void> _fetchUserProfile() async {
     if (_apiToken == null || _apiToken!.isEmpty) return;
     try {
       final response = await http.get(
         Uri.parse('$apiUrl/api/user'),
         headers: {
-          'X-API-Token': _apiToken!, 
+          'X-API-Token': _apiToken!,
           'Accept': 'application/json',
         },
       );
-      print('API Response: ${response.body}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('Decoded username: ${data['username']}');
         if (data['username'] != null) {
           setState(() {
             _name = data['username'];
           });
         }
-      } else {
-        print('Failed to fetch user: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching user profile: $e');
     }
   }
-
 
   Future<void> _fetchDomains() async {
     setState(() => _loading = true);
@@ -134,6 +127,110 @@ class _DomainDashboardState extends State<DomainDashboard> {
       ),
     );
   }
+  void _showRegisterDomainDialog() async {
+    final domainController = TextEditingController();
+    final valueController = TextEditingController();
+    String selectedType = 'A';
+    String userIp = '';
+
+    try {
+      final service = ApiService(apiUrl: apiUrl, apiToken: _apiToken!);
+      userIp = await service.getUserIP();
+    } catch (e) {
+      userIp = 'Unable to fetch IP';
+    }
+
+    final ipController = TextEditingController(text: userIp);
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Register Domain'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: domainController,
+                decoration: const InputDecoration(
+                  labelText: 'Domain',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: valueController,
+                decoration: const InputDecoration(
+                  labelText: 'Value',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: selectedType,
+                decoration: const InputDecoration(
+                  labelText: 'Type',
+                  border: OutlineInputBorder(),
+                ),
+                items: ['A', 'AAAA', 'CNAME', 'TXT', 'NS']
+                    .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) setState(() => selectedType = value);
+                },
+              ),
+              const SizedBox(height: 8),
+              if (selectedType == 'A' || selectedType == 'AAAA') ...[
+                TextField(
+                  controller: ipController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Your IP',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                ElevatedButton(
+                  onPressed: () {
+                    valueController.text = ipController.text;
+                  },
+                  child: const Text('Use Your IP as Value'),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  final service = ApiService(apiUrl: apiUrl, apiToken: _apiToken!);
+                  await service.registerDomain(
+                    domain: domainController.text.trim(),
+                    type: selectedType,
+                    value: valueController.text.trim(),
+                  );
+                  _fetchDomains();
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Domain registered successfully!')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              },
+              child: const Text('Register'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _getPage(int index) {
     switch (index) {
@@ -148,6 +245,17 @@ class _DomainDashboardState extends State<DomainDashboard> {
                   'Hello, ${_name ?? 'User'}!',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _showRegisterDomainDialog,
+                    label: const Text('Register Domain'),
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               if (_loading) const CircularProgressIndicator(),
@@ -176,7 +284,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
           ),
         );
       case 1:
-        return AccountScreen(apiToken: _apiToken!, apiUrl: apiUrl,);
+        return AccountScreen(apiToken: _apiToken!, apiUrl: apiUrl);
       default:
         return const SizedBox.shrink();
     }

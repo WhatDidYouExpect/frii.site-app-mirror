@@ -48,7 +48,7 @@ class DomainCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: selectedType,
+                initialValue: selectedType,
                 decoration: const InputDecoration(labelText: 'Type', border: OutlineInputBorder()),
                 items: ['A', 'AAAA', 'CNAME', 'TXT', 'NS']
                     .map((type) => DropdownMenuItem(value: type, child: Text(type)))
@@ -106,6 +106,40 @@ class DomainCard extends StatelessWidget {
     );
   }
 
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete ${_normalizeDomain(keyName)}?'),
+        content: const Text('This action cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              try {
+                final service = ApiService(apiUrl: apiUrl, apiToken: apiToken);
+                await service.deleteDomain(
+                  domain: _normalizeDomain(keyName),
+                  type: domainData['type'] ?? 'A',
+                );
+                onRefresh();
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Domain deleted successfully!')),
+                );
+              } catch (e) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('Error: $e')));
+              }
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,12 +172,20 @@ class DomainCard extends StatelessWidget {
                 style: const TextStyle(fontSize: 14)),
             Text('Type: ${domainData['type'] ?? 'N/A'}', style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () => _showModifyDialog(context),
-                child: const Text('Modify'),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: () => _confirmDelete(context),
+                  child: const Text('Delete'),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () => _showModifyDialog(context),
+                  child: const Text('Modify'),
+                ),
+              ],
             ),
           ],
         ),

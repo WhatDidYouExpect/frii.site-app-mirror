@@ -69,7 +69,6 @@ class ApiService {
     }
   }
 
-
   Future<void> modifyDomain({
     required String domain,
     required String type,
@@ -96,6 +95,63 @@ class ApiService {
 
     if (response.statusCode != 200) {
       throw Exception('Error ${response.statusCode}');
+    }
+  }
+
+  Future<void> registerDomain({
+    required String domain,
+    required String type,
+    required String value,
+  }) async {
+    if (!await hasInternetConnection()) {
+      throw Exception('No internet connection');
+    }
+
+    final url = Uri.parse('$apiUrl/api/domain');
+
+    final body = json.encode({
+      'domain': _normalizeDomain(domain),
+      'type': type,
+      'value': value,
+    });
+
+    final response = await http.post(
+      url,
+      headers: {
+        'X-API-Token': apiToken,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to register domain: ${response.statusCode}');
+    }
+  }
+
+  Future<void> deleteDomain({
+    required String domain,
+    required String type,
+  }) async {
+    if (!await hasInternetConnection()) {
+      throw Exception('No internet connection');
+    }
+
+    final url = Uri.parse('$apiUrl/api/domain').replace(
+      queryParameters: {
+        'domain': _normalizeDomain(domain),
+        'type': type,
+      },
+    );
+
+    final response = await http.delete(
+      url,
+      headers: {'X-API-Token': apiToken, 'Accept': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete domain: ${response.statusCode}');
     }
   }
 }

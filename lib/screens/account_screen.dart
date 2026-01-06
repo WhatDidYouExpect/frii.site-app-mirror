@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../widgets/profile_card.dart';
-import '../utils/date_formatter.dart';
 
 class AccountScreen extends StatefulWidget {
   final String apiUrl;

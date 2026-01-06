@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import '../screens/logs_screen.dart';
 
 class ApiService {
   final String apiUrl;
@@ -44,12 +45,14 @@ class ApiService {
       }
       return data;
     } else {
+      LogPrint("Error ${response.statusCode}");
       throw Exception('Error ${response.statusCode}');
     }
   }
 
   Future<String> getUserIP() async {
     if (!await hasInternetConnection()) {
+      LogPrint("No internet connection");
       throw Exception('No internet connection');
     }
 
@@ -62,9 +65,11 @@ class ApiService {
         final data = json.decode(response.body) as Map<String, dynamic>;
         return data['ip'] ?? '';
       } else {
+        LogPrint("Failed to fetch IP (${response.statusCode})");
         throw Exception('Failed to fetch IP (${response.statusCode})');
       }
     } catch (e) {
+      LogPrint("Failed to fetch IP: $e");
       throw Exception('Failed to fetch IP: $e');
     }
   }
@@ -75,6 +80,7 @@ class ApiService {
     required String value,
   }) async {
     if (!await hasInternetConnection()) {
+      LogPrint("No internet connection");
       throw Exception('No internet connection');
     }
 
@@ -104,6 +110,7 @@ class ApiService {
     required String value,
   }) async {
     if (!await hasInternetConnection()) {
+      LogPrint("No internet connection");
       throw Exception('No internet connection');
     }
 
@@ -125,8 +132,20 @@ class ApiService {
       body: body,
     );
 
+    final Map<int, String> domainErrorMessages = {
+      400: 'Invalid domain name.',
+      403: 'Domain missing for subdomain (e.g., a.b.frii.site needs b.frii.site registered)',
+      405: 'Domain limit exceeded.',
+      409: 'Domain already in use.',
+      412: 'Invalid DNS record type.',
+      422: 'Validation Error.'
+    };
+
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Failed to register domain: ${response.statusCode}');
+      final message = domainErrorMessages[response.statusCode] ??
+          'Failed to register domain: ${response.statusCode}';
+      LogPrint(message);
+      throw Exception(message);
     }
   }
 
@@ -151,6 +170,7 @@ class ApiService {
     );
 
     if (response.statusCode != 200) {
+      LogPrint('Failed to delete domain: ${response.statusCode}');
       throw Exception('Failed to delete domain: ${response.statusCode}');
     }
   }

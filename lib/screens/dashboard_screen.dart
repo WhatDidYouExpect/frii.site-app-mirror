@@ -6,7 +6,7 @@ import '../services/api_service.dart';
 import '../widgets/domain_card.dart';
 import '../widgets/settings_dialog.dart';
 import 'account_screen.dart';
-
+import 'logs_screen.dart';
 class DomainDashboard extends StatefulWidget {
   const DomainDashboard({super.key});
 
@@ -79,6 +79,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
       }
     } catch (e) {
       print('Error fetching user profile: $e');
+      LogPrint('Error fetching user profile: $e');
     }
   }
 
@@ -93,6 +94,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
       final service = ApiService(apiUrl: apiUrl, apiToken: _apiToken!);
       final domains = await service.fetchDomains();
       setState(() => _domains = domains);
+      LogPrint("Successfully fetched domains!");
     } catch (e) {
       setState(() => _error = e.toString());
     } finally {
@@ -285,6 +287,8 @@ class _DomainDashboardState extends State<DomainDashboard> {
         );
       case 1:
         return AccountScreen(apiToken: _apiToken!, apiUrl: apiUrl);
+      case 2:
+        return AppLogsScreen();
       default:
         return const SizedBox.shrink();
     }
@@ -339,6 +343,17 @@ class _DomainDashboardState extends State<DomainDashboard> {
               onTap: () {
                 setState(() {
                   _selectedPageIndex = 1;
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.computer),
+              title: const Text('Logs'),
+              selected: _selectedPageIndex == 2,
+              onTap: () {
+                setState(() {
+                  _selectedPageIndex = 2;
                 });
                 Navigator.pop(context);
               },

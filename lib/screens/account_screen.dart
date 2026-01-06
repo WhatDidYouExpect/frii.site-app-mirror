@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../widgets/profile_card.dart';
-
+import 'logs_screen.dart';
 class AccountScreen extends StatefulWidget {
   final String apiUrl;
   final String apiToken;
@@ -40,10 +40,12 @@ class _AccountScreenState extends State<AccountScreen> {
         });
       } else {
         print('Failed to fetch user: ${response.statusCode}');
+        LogPrint('Failed to fetch user: ${response.statusCode}');  
         setState(() => _loading = false);
       }
     } catch (e) {
       print('Error fetching user profile: $e');
+      LogPrint('Error fetching user profile: $e');
       setState(() => _loading = false);
     }
   }

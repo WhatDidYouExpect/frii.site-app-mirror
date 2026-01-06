@@ -18,15 +18,27 @@ class DomainCard extends StatelessWidget {
     required this.onRefresh,
   });
 
-  void _showModifyDialog(BuildContext context) {
+  String _normalizeDomain(String domain) => domain.replaceAll('[dot]', '.');
+
+  void _showModifyDialog(BuildContext context) async {
     final valueController = TextEditingController(text: domainData['value'] ?? '');
     String selectedType = domainData['type'] ?? 'A';
+
+    String userIp = '';
+    try {
+      final service = ApiService(apiUrl: apiUrl, apiToken: apiToken);
+      userIp = await service.getUserIP();
+    } catch (e) {
+      userIp = 'Unable to fetch IP';
+    }
+
+    final ipController = TextEditingController(text: userIp);
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text('Modify $keyName'),
+          title: Text('Modify ${_normalizeDomain(keyName)}'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -45,6 +57,24 @@ class DomainCard extends StatelessWidget {
                   if (value != null) setState(() => selectedType = value);
                 },
               ),
+              const SizedBox(height: 8),
+              if (selectedType == 'A' || selectedType == 'AAAA') ...[
+                TextField(
+                  controller: ipController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Your IP',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                ElevatedButton(
+                  onPressed: () {
+                    valueController.text = ipController.text;
+                  },
+                  child: const Text('Update Domain to your IP'),
+                ),
+              ],
             ],
           ),
           actions: [
@@ -54,7 +84,7 @@ class DomainCard extends StatelessWidget {
                 try {
                   final service = ApiService(apiUrl: apiUrl, apiToken: apiToken);
                   await service.modifyDomain(
-                    domain: keyName,
+                    domain: _normalizeDomain(keyName),
                     type: selectedType,
                     value: valueController.text.trim(),
                   );
@@ -64,7 +94,8 @@ class DomainCard extends StatelessWidget {
                     const SnackBar(content: Text('Domain modified successfully!')),
                   );
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Error: $e')));
                 }
               },
               child: const Text('Save'),
@@ -74,6 +105,7 @@ class DomainCard extends StatelessWidget {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +119,8 @@ class DomainCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(keyName.replaceAll('[dot]', '.'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(_normalizeDomain(keyName),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -101,7 +134,8 @@ class DomainCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Text('Last Updated: ${formatDate(domainData['registered'])}', style: const TextStyle(fontSize: 14)),
+            Text('Last Updated: ${formatDate(domainData['registered'])}',
+                style: const TextStyle(fontSize: 14)),
             Text('Type: ${domainData['type'] ?? 'N/A'}', style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 8),
             Align(

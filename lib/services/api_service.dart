@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class ApiService {
   final String apiUrl;
@@ -10,6 +11,7 @@ class ApiService {
 
   /// Check if device can reach the internet
   static Future<bool> hasInternetConnection() async {
+    if (kIsWeb) return true;
     try {
       final result = await InternetAddress.lookup('google.com')
           .timeout(const Duration(seconds: 5));
@@ -18,6 +20,8 @@ class ApiService {
       return false;
     }
   }
+
+  String _normalizeDomain(String domain) => domain.replaceAll('[dot]', '.');
 
   Future<Map<String, dynamic>> fetchDomains() async {
     if (!await hasInternetConnection()) {
@@ -32,11 +36,39 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      if (data.containsKey('domains')) {
+        data['domains'] = (data['domains'] as List)
+            .map((d) => d.toString().replaceAll('[dot]', '.'))
+            .toList();
+      }
+      return data;
     } else {
       throw Exception('Error ${response.statusCode}');
     }
   }
+
+  Future<String> getUserIP() async {
+    if (!await hasInternetConnection()) {
+      throw Exception('No internet connection');
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('https://api.ipify.org?format=json'),
+      ).timeout(const Duration(seconds: 5));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        return data['ip'] ?? '';
+      } else {
+        throw Exception('Failed to fetch IP (${response.statusCode})');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch IP: $e');
+    }
+  }
+
 
   Future<void> modifyDomain({
     required String domain,
@@ -47,9 +79,14 @@ class ApiService {
       throw Exception('No internet connection');
     }
 
-    final normalizedDomain = domain.replaceAll('[dot]', '.');
+    final normalizedDomain = _normalizeDomain(domain);
+
     final url = Uri.parse('$apiUrl/api/domain').replace(
-      queryParameters: {'domain': normalizedDomain, 'type': type, 'value': value},
+      queryParameters: {
+        'domain': normalizedDomain,
+        'type': type,
+        'value': value,
+      },
     );
 
     final response = await http.patch(

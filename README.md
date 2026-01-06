@@ -2,21 +2,21 @@
 The only app you'll ever need.
 
 > [!NOTE]  
-> This app has only been tested on Android. iOS compatibility is **not guaranteed**.
+> This app has only been tested on **Android**. iOS compatibility is **not guaranteed**.
 
 ## Getting Started
 
-To successfully build and run the app, you will need:
+To build and run the app, you will need:
 
 - [Android SDK Command-line Tools](https://developer.android.com/studio#command-line-tools-only)  
 - [Flutter](https://docs.flutter.dev/get-started/quick)
 
 ### Step 1: Install and Configure the Android SDK
 
-After downloading the SDK, add it to your system PATH:
+After downloading the SDK, add it to your system `PATH`:
 
 ```bash
-export ANDROID_SDK_ROOT="your/path/to/android/sdk !!"
+export ANDROID_SDK_ROOT="your/path/to/android/sdk"
 export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
 ```
 
@@ -27,10 +27,25 @@ sdkmanager --install "platform-tools" "platforms;android-33" "build-tools;33.0.2
 sdkmanager --licenses
 ```
 
-### Step 3: Verify the Flutter Setup
-Check your Flutter environment and ensure everything is installed correctly:
+### Step 3: Verify Your Flutter Setup
+
+Check that Flutter is installed and configured correctly:
+
 ```bash
 flutter doctor
 ```
 
-You're done!
+Resolve any issues reported by `flutter doctor` before proceeding.
+
+### Step 4: Build the App for Android
+
+To generate a release APK for Android:
+
+```bash
+flutter build apk --release
+```
+
+Your release APK will be located in the `build/app/outputs/flutter-apk/` directory.
+
+You’re done! The app is now ready to install on your Android device!
+

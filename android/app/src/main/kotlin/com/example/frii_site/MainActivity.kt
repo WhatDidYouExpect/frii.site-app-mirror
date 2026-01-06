@@ -1,4 +1,4 @@
-package com.example.frii_site
+package ovh.expect.friisite
 
 import io.flutter.embedding.android.FlutterActivity
 

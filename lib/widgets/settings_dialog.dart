@@ -60,14 +60,6 @@ class SettingsDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
               controller: urlController,
               decoration: const InputDecoration(
                 labelText: 'API URL',

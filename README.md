@@ -1,15 +1,12 @@
-# frii_site
-
-A new Flutter project.
+# The ONE and ONLY frii.site™ mobile app!
+The only app you'll ever need
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To successfully compile and build the app you will need:
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- [Android SDK Command line tools](https://developer.android.com/studio#command-line-tools-only)
+- [Flutter](https://docs.flutter.dev/cookbook)
 
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,

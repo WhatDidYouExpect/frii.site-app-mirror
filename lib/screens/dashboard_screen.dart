@@ -53,9 +53,15 @@ class _DomainDashboardState extends State<DomainDashboard> {
   }
 
   Future<void> _fetchDomains() async {
-    if (_apiToken == null || _apiToken!.isEmpty) return;
     setState(() => _loading = true);
+
     try {
+      final hasInternet = await ApiService.hasInternetConnection();
+      if (!hasInternet) {
+        _showNoInternetDialog();
+        return;
+      }
+
       final service = ApiService(apiUrl: _apiUrl, apiToken: _apiToken!);
       final domains = await service.fetchDomains();
       setState(() => _domains = domains);
@@ -65,6 +71,23 @@ class _DomainDashboardState extends State<DomainDashboard> {
       setState(() => _loading = false);
     }
   }
+
+  void _showNoInternetDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('No Internet'),
+        content: const Text('Your device is offline. Please check your connection.'),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   void _showSettingsDialog() {
     showDialog(

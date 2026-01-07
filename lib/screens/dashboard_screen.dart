@@ -144,6 +144,21 @@ class _DomainDashboardState extends State<DomainDashboard> {
 
     final ipController = TextEditingController(text: userIp);
 
+    bool isValidDomain(String domain) {
+      LogPrint('Validating domain: "$domain"');
+
+      final regex = RegExp(r'^[a-zA-Z0-9-]+\.(frii\.site|pill\.ovh|arrh\.ovh)$');
+
+      final isValid = regex.hasMatch(domain);
+
+      if (!isValid) {
+        LogPrint('Regex check failed for "$domain"');
+        return false;
+      }
+
+      LogPrint('Regex pass for "$domain"');
+      return true;
+    }
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -204,10 +219,23 @@ class _DomainDashboardState extends State<DomainDashboard> {
           actions: [
             ElevatedButton(
               onPressed: () async {
+                final domain = domainController.text.trim();
+
+                if (!isValidDomain(domain)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Domain must be: {name}.frii.site, {name}.pill.ovh, or {name}.arrh.ovh',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
                 try {
                   final service = ApiService(apiUrl: apiUrl, apiToken: _apiToken!);
                   await service.registerDomain(
-                    domain: domainController.text.trim(),
+                    domain: domain,
                     type: selectedType,
                     value: valueController.text.trim(),
                   );

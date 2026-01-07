@@ -12,7 +12,10 @@ class ApiService {
 
   /// Check if device can reach the internet
   static Future<bool> hasInternetConnection() async {
-    if (kIsWeb) return true;
+    if (kIsWeb) {
+      LogPrint("Client is a web browser! skipping network check.."); 
+      return true;
+    }
     try {
       final result = await InternetAddress.lookup('google.com')
           .timeout(const Duration(seconds: 5));
@@ -142,10 +145,12 @@ class ApiService {
     };
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      final message = domainErrorMessages[response.statusCode] ??
-          'Failed to register domain: ${response.statusCode}';
-      LogPrint(message);
-      throw Exception(message);
+      final statusCode = response.statusCode;
+      final responseBody = response.body;
+      final message = domainErrorMessages[statusCode] ??
+          'Failed to register domain';
+      LogPrint('Failed to register domain $domain\nStatus Code: $statusCode\nResponse Body:\n$responseBody');
+      throw Exception('$message (Status Code: $statusCode)');
     }
   }
 

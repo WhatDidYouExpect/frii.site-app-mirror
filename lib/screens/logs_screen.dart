@@ -24,6 +24,8 @@ class AppLogs {
   static List<String> get logs => List.unmodifiable(_logs.reversed);
 }
 
+const bgColor = Color(0xFF121212);
+
 class FriiApp extends StatelessWidget {
   const FriiApp({super.key});
 
@@ -31,6 +33,11 @@ class FriiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: bgColor,
+        cardColor: bgColor,
+        brightness: Brightness.dark,
+      ),
       home: const AppLogsScreen(),
     );
   }
@@ -44,52 +51,33 @@ class AppLogsScreen extends StatefulWidget {
 }
 
 class _AppLogsScreenState extends State<AppLogsScreen> {
-  Widget _buildLogCard(String log, int index) {
-    return Card(
-      color: const Color(0xFF2A2A2A),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-      child: InkWell(
-        onLongPress: () {
-          Clipboard.setData(ClipboardData(text: log));
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Log copied to clipboard')),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              const SizedBox(width: 12),
-              Expanded(
-                child: SelectableText(
-                  log,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgColor,
       body: StreamBuilder<List<String>>(
         stream: AppLogs.logsStream,
         initialData: AppLogs.logs,
         builder: (context, snapshot) {
           final logs = snapshot.data ?? [];
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: logs.length,
-            itemBuilder: (context, index) {
-              return _buildLogCard(logs[index], index);
-            },
+          final combinedLogs = logs.join('\n\n');
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+            child: InkWell(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onLongPress: () {
+                Clipboard.setData(ClipboardData(text: combinedLogs));
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: SelectableText(
+                  combinedLogs.isEmpty ? 'No logs yet' : combinedLogs,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
           );
         },
       ),

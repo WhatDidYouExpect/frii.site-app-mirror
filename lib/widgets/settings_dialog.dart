@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../utils/theme_manager.dart';
 
-class SettingsDialog extends StatelessWidget {
+class SettingsDialog extends StatefulWidget {
   final String? apiToken;
   final String? name;
   final String apiUrl;
@@ -13,6 +14,19 @@ class SettingsDialog extends StatelessWidget {
     required this.apiUrl,
     required this.onSave,
   });
+
+  @override
+  State<SettingsDialog> createState() => _SettingsDialogState();
+}
+
+class _SettingsDialogState extends State<SettingsDialog> {
+  String? selectedTheme;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedTheme = 'Default'; // default selection
+  }
 
   void _showCredits(BuildContext context) {
     showDialog(
@@ -33,9 +47,9 @@ class SettingsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokenController = TextEditingController(text: apiToken ?? '');
-    final nameController = TextEditingController(text: name ?? '');
-    final urlController = TextEditingController(text: apiUrl);
+    final tokenController = TextEditingController(text: widget.apiToken ?? '');
+    final nameController = TextEditingController(text: widget.name ?? '');
+    final urlController = TextEditingController(text: widget.apiUrl);
 
     return AlertDialog(
       title: Row(
@@ -66,6 +80,30 @@ class SettingsDialog extends StatelessWidget {
                 border: OutlineInputBorder(),
               ),
             ),
+            const SizedBox(height: 8),
+            // Theme dropdown
+            DropdownButtonFormField<String>(
+              value: selectedTheme,
+              decoration: const InputDecoration(
+                labelText: 'Select Theme',
+                border: OutlineInputBorder(),
+              ),
+              items: availableThemes.keys
+                  .map((themeName) => DropdownMenuItem(
+                        value: themeName,
+                        child: Text(themeName),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedTheme = value;
+                  // Update the global theme immediately
+                  if (value != null) {
+                    setAppTheme(availableThemes[value]!);
+                  }
+                });
+              },
+            ),
           ],
         ),
       ),
@@ -73,7 +111,7 @@ class SettingsDialog extends StatelessWidget {
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
         ElevatedButton(
           onPressed: () {
-            onSave(
+            widget.onSave(
               token: tokenController.text.trim(),
               name: nameController.text.trim(),
               apiUrl: urlController.text.trim(),

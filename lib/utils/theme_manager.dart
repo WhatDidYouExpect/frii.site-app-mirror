@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final ValueNotifier<ThemeData> appThemeNotifier = ValueNotifier(_defaultTheme());
 
@@ -23,39 +24,6 @@ ThemeData _defaultTheme() => ThemeData(
       ),
     );
 
-void setAppTheme(ThemeData newTheme) {
-  appThemeNotifier.value = newTheme;
-}
-
-ThemeData getSeasonalTheme() {
-  final now = DateTime.now();
-
-  if (now.month == 10 && now.day == 31) {
-    return ThemeData(
-      brightness: Brightness.dark,
-      colorScheme: const ColorScheme.dark(
-        primary: Colors.orange,
-        secondary: Colors.black,
-      ),
-      scaffoldBackgroundColor: const Color(0xFF1A1A1A),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF2A1A00),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ),
-    );
-  }
-
-  return _defaultTheme();
-}
-
 final Map<String, ThemeData> availableThemes = {
   'Default': _defaultTheme(),
   'Halloween': ThemeData(
@@ -79,3 +47,46 @@ final Map<String, ThemeData> availableThemes = {
     ),
   ),
 };
+Future<void> setAppTheme(String themeKey) async {
+  if (!availableThemes.containsKey(themeKey)) return;
+
+  final newTheme = availableThemes[themeKey]!;
+
+  if (appThemeNotifier.value != newTheme) {
+    appThemeNotifier.value = newTheme;
+    print('Theme changed to: $themeKey');
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedTheme', themeKey);
+  } else {
+    print('Theme already set to: $themeKey');
+  }
+}
+
+Future<ThemeData> loadSavedTheme() async {
+  final prefs = await SharedPreferences.getInstance();
+  final savedTheme = prefs.getString('selectedTheme');
+
+  ThemeData themeToApply;
+
+  if (savedTheme != null && availableThemes.containsKey(savedTheme)) {
+    themeToApply = availableThemes[savedTheme]!;
+    print('Loaded saved theme: $savedTheme');
+  } else {
+    themeToApply = getSeasonalTheme();
+    print('No saved theme found, using seasonal/default theme');
+  }
+
+  return themeToApply;
+}
+
+
+ThemeData getSeasonalTheme() {
+  final now = DateTime.now();
+
+  if (now.month == 10 && now.day == 31) {
+    return availableThemes['Halloween']!;
+  }
+
+  return _defaultTheme();
+}

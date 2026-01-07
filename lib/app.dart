@@ -2,6 +2,16 @@ import 'package:flutter/material.dart';
 import 'screens/dashboard_screen.dart';
 import 'utils/theme_manager.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  ThemeData initialTheme = await loadSavedTheme();
+  appThemeNotifier.value = initialTheme;
+  print('Running main with theme applied');
+
+  // Run the app
+  runApp(const MyApp());
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -10,10 +20,10 @@ class MyApp extends StatelessWidget {
     return ValueListenableBuilder<ThemeData>(
       valueListenable: appThemeNotifier,
       builder: (context, theme, _) {
+        print('Building MaterialApp with theme: ${theme.brightness}');
         return MaterialApp(
           title: 'Domain Dashboard',
           theme: theme,
-          themeMode: ThemeMode.dark,
           home: const DomainDashboard(),
         );
       },

@@ -97,9 +97,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
               onChanged: (value) {
                 setState(() {
                   selectedTheme = value;
-                  // Update the global theme immediately
                   if (value != null) {
-                    setAppTheme(availableThemes[value]!);
+                    setAppTheme(value);
                   }
                 });
               },

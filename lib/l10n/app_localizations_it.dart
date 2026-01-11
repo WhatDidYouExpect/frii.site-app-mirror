@@ -9,6 +9,18 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
+  String get donationPopupTitle => 'Hai pensato di fare una donazione?';
+
+  @override
+  String get donationPopupText => 'frii.site non è mai stato redditizio, ma a causa dell\'aumento dei prezzi del nostro dominio da parte di Namecheap, stiamo perdendo più soldi che mai. Anche piccole donazioni (ad esempio €1 o 1 Fr.) sarebbero di grande aiuto.';
+
+  @override
+  String get donationPopupButton => 'Vedi le opzioni di donazione';
+
+  @override
+  String get dontShowAgainButton => 'Non mostrare più';
+
+  @override
   String get emailLabel => 'Email';
 
   @override

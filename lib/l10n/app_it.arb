@@ -1,4 +1,8 @@
 {
+    "donationPopupTitle": "Hai pensato di fare una donazione?",
+    "donationPopupText": "frii.site non è mai stato redditizio, ma a causa dell'aumento dei prezzi del nostro dominio da parte di Namecheap, stiamo perdendo più soldi che mai. Anche piccole donazioni (ad esempio €1 o 1 Fr.) sarebbero di grande aiuto.",
+    "donationPopupButton": "Vedi le opzioni di donazione",
+    "dontShowAgainButton": "Non mostrare più",
     "emailLabel": "Email",
     "languageLabel": "Lingua",
     "cityLabel": "Città",

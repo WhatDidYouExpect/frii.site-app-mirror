@@ -95,6 +95,30 @@ abstract class AppLocalizations {
     Locale('it')
   ];
 
+  /// No description provided for @donationPopupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Have you considered donating?'**
+  String get donationPopupTitle;
+
+  /// No description provided for @donationPopupText.
+  ///
+  /// In en, this message translates to:
+  /// **'frii.site has never been profitable, but due to Namecheap raising our domain\'s prices, we are losing more money than we ever have. Even small donations (e.g. 1€ or \$1) would help out immensely.'**
+  String get donationPopupText;
+
+  /// No description provided for @donationPopupButton.
+  ///
+  /// In en, this message translates to:
+  /// **'View donation options'**
+  String get donationPopupButton;
+
+  /// No description provided for @dontShowAgainButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show again'**
+  String get dontShowAgainButton;
+
   /// No description provided for @emailLabel.
   ///
   /// In en, this message translates to:

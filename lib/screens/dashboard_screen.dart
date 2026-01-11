@@ -6,6 +6,7 @@ import '../services/api_service.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/domain_card.dart';
 import '../widgets/settings_dialog.dart';
+import '../widgets/popup.dart';
 import 'account_screen.dart';
 import 'blog_screen.dart';
 import 'logs_screen.dart';
@@ -18,6 +19,7 @@ class DomainDashboard extends StatefulWidget {
 }
 
 class _DomainDashboardState extends State<DomainDashboard> {
+  final String _donationPopupKey = 'donation_popup_shown';
   String? _apiToken;
   String? _name;
   String apiUrl = 'https://beta.frii.site';
@@ -30,7 +32,9 @@ class _DomainDashboardState extends State<DomainDashboard> {
   void initState() {
     super.initState();
     _loadSettings();
+    _showDonationPopupOnce();
   }
+
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
@@ -45,6 +49,35 @@ class _DomainDashboardState extends State<DomainDashboard> {
       _fetchDomains();
     }
   }
+
+  Future<void> _showDonationPopupOnce() async {
+    final prefs = await SharedPreferences.getInstance();
+    final shown = prefs.getBool(_donationPopupKey) ?? false;
+    if (shown) return;
+
+    final l10n = AppLocalizations.of(context)!;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (context) => ConfigurablePopup(
+          title: l10n.donationPopupTitle,
+          text: l10n.donationPopupText,
+          links: {l10n.donationPopupButton: 'https://ko-fi.com/ctih1'},
+          extraActions: [
+            TextButton(
+              onPressed: () async {
+                await prefs.setBool(_donationPopupKey, true);
+                Navigator.of(context).pop();
+              },
+              child: Text(l10n.dontShowAgainButton),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
 
   Future<void> _saveSettings({String? token, String? name, String? apiUrl}) async {
     final prefs = await SharedPreferences.getInstance();

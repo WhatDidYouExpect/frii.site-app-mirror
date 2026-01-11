@@ -1,4 +1,8 @@
 {
+    "donationPopupTitle": "Have you considered donating?",
+    "donationPopupText": "frii.site has never been profitable, but due to Namecheap raising our domain's prices, we are losing more money than we ever have. Even small donations (e.g. 1€ or $1) would help out immensely.",
+    "donationPopupButton": "View donation options",
+    "dontShowAgainButton": "Don't show again",
     "emailLabel": "Email",
     "languageLabel": "Language",
     "cityLabel": "City",

@@ -7,6 +7,7 @@ import '../l10n/app_localizations.dart';
 import '../widgets/domain_card.dart';
 import '../widgets/settings_dialog.dart';
 import '../widgets/popup.dart';
+import '../widgets/sidebar.dart';
 import 'account_screen.dart';
 import 'blog_screen.dart';
 import 'logs_screen.dart';
@@ -364,6 +365,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.appBarTitle),
@@ -380,59 +382,17 @@ class _DomainDashboardState extends State<DomainDashboard> {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-              ),
-              child: Text(
-                _name ?? 'User',
-                style: const TextStyle(color: Colors.white, fontSize: 24),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.dashboard),
-              title: Text(l10n.drawerDashboard),
-              selected: _selectedPageIndex == 0,
-              onTap: () {
-                setState(() => _selectedPageIndex = 0);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_circle),
-              title: Text(l10n.drawerAccount),
-              selected: _selectedPageIndex == 1,
-              onTap: () {
-                setState(() => _selectedPageIndex = 1);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.book),
-              title: Text(l10n.drawerBlogs),
-              selected: _selectedPageIndex == 3,
-              onTap: () {
-                setState(() => _selectedPageIndex = 3);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.computer),
-              title: Text(l10n.drawerLogs),
-              selected: _selectedPageIndex == 2,
-              onTap: () {
-                setState(() => _selectedPageIndex = 2);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
+
+      drawer: Sidebar(
+        username: _name,
+        selectedIndex: _selectedPageIndex,
+        onSelect: (index) {
+          setState(() => _selectedPageIndex = index);
+        },
       ),
+
       body: _getPage(_selectedPageIndex),
     );
   }
+
 }

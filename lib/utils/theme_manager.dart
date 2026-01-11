@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-final ValueNotifier<ThemeData> appThemeNotifier = ValueNotifier(_materialDarkTheme());
+final ValueNotifier<ThemeData> appThemeNotifier = ValueNotifier(_materialBlueTheme());
 ThemeData _materialDarkTheme() => ThemeData.dark();
 ThemeData _halloweenTheme() => ThemeData(
       brightness: Brightness.dark,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../utils/date_formatter.dart';
+import '../l10n/app_localizations.dart';
 
 class DomainCard extends StatelessWidget {
   final String keyName;
@@ -21,6 +22,7 @@ class DomainCard extends StatelessWidget {
   String _normalizeDomain(String domain) => domain.replaceAll('[dot]', '.');
 
   void _showModifyDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final valueController = TextEditingController(text: domainData['value'] ?? '');
     String selectedType = domainData['type'] ?? 'A';
 
@@ -29,7 +31,7 @@ class DomainCard extends StatelessWidget {
       final service = ApiService(apiUrl: apiUrl, apiToken: apiToken);
       userIp = await service.getUserIP();
     } catch (e) {
-      userIp = 'Unable to fetch IP';
+      userIp = l10n.unableToFetchIp;
     }
 
     final ipController = TextEditingController(text: userIp);
@@ -38,18 +40,24 @@ class DomainCard extends StatelessWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text('Modify ${_normalizeDomain(keyName)}'),
+          title: Text(l10n.modifyDomainTitle(_normalizeDomain(keyName))),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: valueController,
-                decoration: const InputDecoration(labelText: 'Value', border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: l10n.valueLabel,
+                  border: const OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                initialValue: selectedType,
-                decoration: const InputDecoration(labelText: 'Type', border: OutlineInputBorder()),
+                value: selectedType,
+                decoration: InputDecoration(
+                  labelText: l10n.typeLabel,
+                  border: const OutlineInputBorder(),
+                ),
                 items: ['A', 'AAAA', 'CNAME', 'TXT', 'NS']
                     .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                     .toList(),
@@ -62,9 +70,9 @@ class DomainCard extends StatelessWidget {
                 TextField(
                   controller: ipController,
                   readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Your IP',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.yourIpLabel,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -72,13 +80,16 @@ class DomainCard extends StatelessWidget {
                   onPressed: () {
                     valueController.text = ipController.text;
                   },
-                  child: const Text('Update Domain to your IP'),
+                  child: Text(l10n.useYourIpButton),
                 ),
               ],
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancelButton),
+            ),
             ElevatedButton(
               onPressed: () async {
                 try {
@@ -91,14 +102,15 @@ class DomainCard extends StatelessWidget {
                   onRefresh();
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Domain modified successfully!')),
+                    SnackBar(content: Text(l10n.domainModifiedSuccess)),
                   );
                 } catch (e) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text('Error: $e')));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${l10n.domainModifyError}: $e')),
+                  );
                 }
               },
-              child: const Text('Save'),
+              child: Text(l10n.saveButton),
             ),
           ],
         ),
@@ -107,13 +119,14 @@ class DomainCard extends StatelessWidget {
   }
 
   void _confirmDelete(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete ${_normalizeDomain(keyName)}?'),
-        content: const Text('This action cannot be undone.'),
+        title: Text(l10n.deleteDomainTitle(_normalizeDomain(keyName))),
+        content: Text(l10n.deleteDomainWarning),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancelButton)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
@@ -126,15 +139,16 @@ class DomainCard extends StatelessWidget {
                 onRefresh();
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Domain deleted successfully!')),
+                  SnackBar(content: Text(l10n.domainDeletedSuccess)),
                 );
               } catch (e) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Error: $e')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${l10n.domainDeleteError}: $e')),
+                );
               }
             },
-            child: const Text('Delete'),
+            child: Text(l10n.deleteButton),
           ),
         ],
       ),
@@ -143,6 +157,7 @@ class DomainCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       color: const Color(0xFF2A2A2A),
       elevation: 2,
@@ -153,12 +168,14 @@ class DomainCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(_normalizeDomain(keyName),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(
+              _normalizeDomain(keyName),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
-                const Text('IP: ', style: TextStyle(fontSize: 14)),
+                Text('${l10n.ipLabel}: ', style: const TextStyle(fontSize: 14)),
                 Expanded(
                   child: SelectableText(
                     domainData['ip'] ?? '',
@@ -168,9 +185,10 @@ class DomainCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Text('Last Updated: ${formatDate(domainData['registered'])}',
+            Text('${l10n.lastUpdatedLabel}: ${formatDate(domainData['registered'])}',
                 style: const TextStyle(fontSize: 14)),
-            Text('Type: ${domainData['type'] ?? 'N/A'}', style: const TextStyle(fontSize: 14)),
+            Text('${l10n.typeLabel}: ${domainData['type'] ?? 'N/A'}',
+                style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -178,12 +196,12 @@ class DomainCard extends StatelessWidget {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   onPressed: () => _confirmDelete(context),
-                  child: const Text('Delete'),
+                  child: Text(l10n.deleteButton),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () => _showModifyDialog(context),
-                  child: const Text('Modify'),
+                  child: Text(l10n.modifyButton),
                 ),
               ],
             ),

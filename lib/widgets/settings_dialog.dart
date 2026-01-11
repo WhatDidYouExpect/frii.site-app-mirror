@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/app_localizations.dart';
+import '../utils/language_manager.dart';
 import '../utils/theme_manager.dart';
 
 class SettingsDialog extends StatefulWidget {
   final String? apiToken;
   final String? name;
-  final String apiUrl;
-  final Function({String? token, String? name, String? apiUrl}) onSave;
+  final String? apiUrl;
+  final void Function({
+    required String token,
+    required String name,
+    required String apiUrl,
+  })? onSave;
 
   const SettingsDialog({
     super.key,
     this.apiToken,
     this.name,
-    required this.apiUrl,
-    required this.onSave,
+    this.apiUrl,
+    this.onSave,
   });
 
   @override
@@ -21,25 +28,31 @@ class SettingsDialog extends StatefulWidget {
 
 class _SettingsDialogState extends State<SettingsDialog> {
   String? selectedTheme;
+  String? selectedLanguage;
 
   @override
   void initState() {
     super.initState();
-    selectedTheme = 'Default'; // default selection
+    selectedLanguage = appLocaleNotifier.value.languageCode;
+    selectedTheme = availableThemes.entries
+        .firstWhere(
+          (entry) => entry.value == appThemeNotifier.value,
+          orElse: () => MapEntry('Material Dark', availableThemes['Material Dark']!),
+        )
+        .key;
   }
 
   void _showCredits(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         title: const Text('Credits'),
-        content: const Text(
-          'whatdidyouexpect was here!\n'
-          'Thanks to ctih for actually creating frii.site!\n'
-          'Thank you for using this app!',
-        ),
+        content: const Text('whatdidyouexpect was here!\ncredits to ctih1!'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
         ],
       ),
     );
@@ -47,14 +60,15 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final tokenController = TextEditingController(text: widget.apiToken ?? '');
     final nameController = TextEditingController(text: widget.name ?? '');
-    final urlController = TextEditingController(text: widget.apiUrl);
+    final urlController = TextEditingController(text: widget.apiUrl ?? '');
 
     return AlertDialog(
       title: Row(
         children: [
-          const Text('Settings'),
+          Text(l10n.settings),
           const SizedBox(width: 8),
           GestureDetector(
             onTap: () => _showCredits(context),
@@ -67,21 +81,40 @@ class _SettingsDialogState extends State<SettingsDialog> {
           children: [
             TextField(
               controller: tokenController,
-              decoration: const InputDecoration(
-                labelText: 'API Token',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.apiToken,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: urlController,
-              decoration: const InputDecoration(
-                labelText: 'API URL',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.apiUrl,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 8),
-            // Theme dropdown
+            DropdownButtonFormField<String>(
+              value: selectedLanguage,
+              decoration: InputDecoration(
+                labelText: l10n.selectLanguage,
+                border: const OutlineInputBorder(),
+              ),
+              items: AppLocalizations.supportedLocales
+                  .map((locale) => DropdownMenuItem(
+                        value: locale.languageCode,
+                        child: Text(locale.languageCode.toUpperCase()),
+                      ))
+                  .toList(),
+              onChanged: (value) async {
+                if (value != null) {
+                  await setAppLocale(value);
+                  setState(() => selectedLanguage = value);
+                }
+              },
+            ),
+            const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               value: selectedTheme,
               decoration: const InputDecoration(
@@ -95,29 +128,32 @@ class _SettingsDialogState extends State<SettingsDialog> {
                       ))
                   .toList(),
               onChanged: (value) {
-                setState(() {
-                  selectedTheme = value;
-                  if (value != null) {
-                    setAppTheme(value);
-                  }
-                });
+                if (value != null) {
+                  setState(() => selectedTheme = value);
+                  setAppTheme(value);
+                }
               },
             ),
           ],
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
         ElevatedButton(
           onPressed: () {
-            widget.onSave(
-              token: tokenController.text.trim(),
-              name: nameController.text.trim(),
-              apiUrl: urlController.text.trim(),
-            );
+            if (widget.onSave != null) {
+              widget.onSave!(
+                token: tokenController.text.trim(),
+                name: nameController.text.trim(),
+                apiUrl: urlController.text.trim(),
+              );
+            }
             Navigator.pop(context);
           },
-          child: const Text('Save'),
+          child: Text(l10n.save),
         ),
       ],
     );

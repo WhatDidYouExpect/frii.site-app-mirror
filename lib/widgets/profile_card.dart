@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import '../utils/date_formatter.dart';
+import '../l10n/app_localizations.dart';
 
 class ProfileCard extends StatelessWidget {
   final Map<String, dynamic> userData;
 
   const ProfileCard({super.key, required this.userData});
 
-  Widget _buildRow(IconData icon, String label, String value) {
+  Widget _buildRow(String label, String value, {IconData? icon}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.blueAccent),
-          const SizedBox(width: 8),
+          if (icon != null) Icon(icon, size: 20, color: Colors.blueAccent),
+          if (icon != null) const SizedBox(width: 8),
           Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
           Expanded(child: Text(value)),
         ],
@@ -36,9 +37,11 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final country = userData['country'] ?? {};
     final permissions = userData['permissions'] ?? {};
-    final ownedTlds = (userData['owned-tlds'] as List<dynamic>?)?.join(', ') ?? 'None';
+    final ownedTlds = (userData['owned-tlds'] as List<dynamic>?)?.join(', ') ?? l10n.none;
 
     return Card(
       color: const Color(0xFF2A2A2A),
@@ -55,26 +58,26 @@ class ProfileCard extends StatelessWidget {
                 _buildInitialAvatar(userData['username'] ?? ''),
                 const SizedBox(width: 12),
                 Text(
-                  userData['username'] ?? 'Unknown',
+                  userData['username'] ?? l10n.unknown,
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const Divider(color: Colors.white24, height: 20),
-            _buildRow(Icons.email, 'Email', userData['email'] ?? 'N/A'),
-            _buildRow(Icons.language, 'Language', userData['lang'] ?? 'N/A'),
-            _buildRow(Icons.location_on, 'City', country['city'] ?? 'N/A'),
-            _buildRow(Icons.flag, 'Country', country['country_name'] ?? 'N/A'),
-            _buildRow(Icons.calendar_today, 'Joined', formatDate(userData['created'])),
-            _buildRow(Icons.security, '2FA Enabled', userData['mfa_enabled'] == true ? 'Yes' : 'No'),
-            _buildRow(Icons.code, 'Referral Code', userData['referral-code'] ?? 'N/A'),
-            _buildRow(Icons.people, 'Referred People', '${userData['referred-people'] ?? 0}'),
+            _buildRow(l10n.emailLabel, userData['email'] ?? l10n.notAvailable, icon: Icons.email),
+            _buildRow(l10n.languageLabel, userData['lang'] ?? l10n.notAvailable, icon: Icons.language),
+            _buildRow(l10n.cityLabel, country['city'] ?? l10n.notAvailable, icon: Icons.location_on),
+            _buildRow(l10n.countryLabel, country['country_name'] ?? l10n.notAvailable, icon: Icons.flag),
+            _buildRow(l10n.joinedLabel, formatDate(userData['created']), icon: Icons.calendar_today),
+            _buildRow(l10n.twoFaEnabledLabel, userData['mfa_enabled'] == true ? l10n.yes : l10n.no, icon: Icons.security),
+            _buildRow(l10n.referralCodeLabel, userData['referral-code'] ?? l10n.notAvailable, icon: Icons.code),
+            _buildRow(l10n.referredPeopleLabel, '${userData['referred-people'] ?? 0}', icon: Icons.people),
             const Divider(color: Colors.white24, height: 20),
-            _buildRow(Icons.admin_panel_settings, 'Max Domains', '${permissions['max-domains'] ?? 0}'),
-            _buildRow(Icons.subdirectory_arrow_right, 'Max Subdomains', '${permissions['max-subdomains'] ?? 0}'),
-            _buildRow(Icons.details, 'User Details Access', '${permissions['userdetails'] ?? false}'),
-            _buildRow(Icons.language, 'Owned TLDs', ownedTlds),
-            _buildRow(Icons.discord, 'Discord Linked', userData['discord-linked'] == true ? 'Yes' : 'No'),
+            _buildRow(l10n.maxDomainsLabel, '${permissions['max-domains'] ?? 0}', icon: Icons.admin_panel_settings),
+            _buildRow(l10n.maxSubdomainsLabel, '${permissions['max-subdomains'] ?? 0}', icon: Icons.subdirectory_arrow_right),
+            _buildRow(l10n.userDetailsAccessLabel, '${permissions['userdetails'] ?? false}', icon: Icons.details),
+            _buildRow(l10n.ownedTldsLabel, ownedTlds, icon: Icons.language),
+            _buildRow(l10n.discordLinkedLabel, userData['discord-linked'] == true ? l10n.yes : l10n.no, icon: Icons.discord),
           ],
         ),
       ),

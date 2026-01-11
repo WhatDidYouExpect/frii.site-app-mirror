@@ -1,21 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-final ValueNotifier<ThemeData> appThemeNotifier = ValueNotifier(_defaultTheme());
-
-ThemeData _defaultTheme() => ThemeData(
+final ValueNotifier<ThemeData> appThemeNotifier = ValueNotifier(_materialDarkTheme());
+ThemeData _materialDarkTheme() => ThemeData.dark();
+ThemeData _halloweenTheme() => ThemeData(
       brightness: Brightness.dark,
       colorScheme: const ColorScheme.dark(
-        primary: Colors.white,
-        secondary: Color.fromARGB(255, 38, 143, 255),
+        primary: Colors.orange,
+        secondary: Colors.black,
       ),
-      scaffoldBackgroundColor: const Color(0xFF121212),
+      scaffoldBackgroundColor: const Color(0xFF1A1A1A),
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color.fromARGB(255, 47, 47, 47),
+        backgroundColor: Color(0xFF2A1A00),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(255, 38, 143, 255),
+          backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+
+ThemeData _materialBlueTheme() => ThemeData(
+      brightness: Brightness.dark,
+      primarySwatch: Colors.blue,
+      colorScheme: ColorScheme.dark(
+        primary: Colors.blue,
+        secondary: Colors.lightBlueAccent,
+      ),
+      scaffoldBackgroundColor: const Color(0xFF121212),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.blueAccent,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -25,43 +46,10 @@ ThemeData _defaultTheme() => ThemeData(
     );
 
 final Map<String, ThemeData> availableThemes = {
-  'Default': _defaultTheme(),
-  'Halloween': ThemeData(
-    brightness: Brightness.dark,
-    colorScheme: const ColorScheme.dark(
-      primary: Colors.orange,
-      secondary: Colors.black,
-    ),
-    scaffoldBackgroundColor: const Color(0xFF1A1A1A),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF2A1A00),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.orange,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    ),
-  ),
+  'Material Dark': _materialDarkTheme(),
+  'Halloween': _halloweenTheme(),
+  'Material Blue': _materialBlueTheme(),
 };
-Future<void> setAppTheme(String themeKey) async {
-  if (!availableThemes.containsKey(themeKey)) return;
-
-  final newTheme = availableThemes[themeKey]!;
-
-  if (appThemeNotifier.value != newTheme) {
-    appThemeNotifier.value = newTheme;
-    print('Theme changed to: $themeKey');
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedTheme', themeKey);
-  } else {
-    print('Theme already set to: $themeKey');
-  }
-}
 
 Future<ThemeData> loadSavedTheme() async {
   final prefs = await SharedPreferences.getInstance();
@@ -73,20 +61,26 @@ Future<ThemeData> loadSavedTheme() async {
     themeToApply = availableThemes[savedTheme]!;
     print('Loaded saved theme: $savedTheme');
   } else {
-    themeToApply = getSeasonalTheme();
-    print('No saved theme found, using seasonal/default theme');
+    final now = DateTime.now();
+    if (now.month == 10 && now.day == 31) {
+      themeToApply = _halloweenTheme();
+      print('No saved theme found, using Halloween theme');
+    } else {
+      themeToApply = _materialDarkTheme();
+      print('No saved theme found, using Material Dark theme');
+    }
   }
 
+  appThemeNotifier.value = themeToApply;
   return themeToApply;
 }
 
 
-ThemeData getSeasonalTheme() {
-  final now = DateTime.now();
+Future<void> setAppTheme(String themeName) async {
+  if (!availableThemes.containsKey(themeName)) return;
 
-  if (now.month == 10 && now.day == 31) {
-    return availableThemes['Halloween']!;
-  }
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('selectedTheme', themeName);
 
-  return _defaultTheme();
+  appThemeNotifier.value = availableThemes[themeName]!;
 }

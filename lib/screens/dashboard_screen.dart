@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
+import '../l10n/app_localizations.dart';
 import '../widgets/domain_card.dart';
 import '../widgets/settings_dialog.dart';
 import 'account_screen.dart';
+import 'blog_screen.dart';
 import 'logs_screen.dart';
+
 class DomainDashboard extends StatefulWidget {
   const DomainDashboard({super.key});
 
@@ -103,15 +106,16 @@ class _DomainDashboardState extends State<DomainDashboard> {
   }
 
   void _showNoInternetDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('No Internet'),
-        content: const Text('Your device is offline. Please check your connection.'),
+        title: Text(l10n.noInternetTitle),
+        content: Text(l10n.noInternetMessage),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text(l10n.okButton),
           ),
         ],
       ),
@@ -129,7 +133,9 @@ class _DomainDashboardState extends State<DomainDashboard> {
       ),
     );
   }
+
   void _showRegisterDomainDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final domainController = TextEditingController();
     final valueController = TextEditingController();
     String selectedType = 'A';
@@ -146,48 +152,45 @@ class _DomainDashboardState extends State<DomainDashboard> {
 
     bool isValidDomain(String domain) {
       LogPrint('Validating domain: "$domain"');
-
       final regex = RegExp(r'^[a-zA-Z0-9-]+\.(frii\.site|pill\.ovh|arrh\.ovh)$');
-
       final isValid = regex.hasMatch(domain);
-
       if (!isValid) {
         LogPrint('Regex check failed for "$domain"');
         return false;
       }
-
       LogPrint('Regex pass for "$domain"');
       return true;
     }
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Register Domain'),
+          title: Text(l10n.registerDomainTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: domainController,
-                decoration: const InputDecoration(
-                  labelText: 'Domain',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.domainLabel,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: valueController,
-                decoration: const InputDecoration(
-                  labelText: 'Value',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.valueLabel,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                initialValue: selectedType,
-                decoration: const InputDecoration(
-                  labelText: 'Type',
-                  border: OutlineInputBorder(),
+                value: selectedType,
+                decoration: InputDecoration(
+                  labelText: l10n.typeLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 items: ['A', 'AAAA', 'CNAME', 'TXT', 'NS']
                     .map((type) => DropdownMenuItem(value: type, child: Text(type)))
@@ -201,9 +204,9 @@ class _DomainDashboardState extends State<DomainDashboard> {
                 TextField(
                   controller: ipController,
                   readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Your IP',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.yourIpLabel,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -211,7 +214,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
                   onPressed: () {
                     valueController.text = ipController.text;
                   },
-                  child: const Text('Use Your IP as Value'),
+                  child: Text(l10n.useYourIpButton),
                 ),
               ],
             ],
@@ -223,9 +226,9 @@ class _DomainDashboardState extends State<DomainDashboard> {
 
                 if (!isValidDomain(domain)) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
-                        'Domain must be: {name}.frii.site, {name}.pill.ovh, or {name}.arrh.ovh',
+                        l10n.invalidDomainMessage(domain),
                       ),
                     ),
                   );
@@ -242,19 +245,19 @@ class _DomainDashboardState extends State<DomainDashboard> {
                   _fetchDomains();
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Domain registered successfully!')),
+                    SnackBar(content: Text(l10n.domainRegisteredSuccess)),
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e')),
+                    SnackBar(content: Text('${l10n.domainRegisterError}: $e')),
                   );
                 }
               },
-              child: const Text('Register'),
+              child: Text(l10n.registerButton),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancelButton),
             ),
           ],
         ),
@@ -263,6 +266,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
   }
 
   Widget _getPage(int index) {
+    final l10n = AppLocalizations.of(context)!;
     switch (index) {
       case 0:
         return Padding(
@@ -272,7 +276,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Hello, ${_name ?? 'User'}!',
+                  l10n.helloUser(_name ?? 'User'),
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -282,7 +286,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: _showRegisterDomainDialog,
-                    label: const Text('Register Domain'),
+                    label: Text(l10n.registerDomainTitle),
                     icon: const Icon(Icons.add),
                   ),
                 ],
@@ -317,6 +321,8 @@ class _DomainDashboardState extends State<DomainDashboard> {
         return AccountScreen(apiToken: _apiToken!, apiUrl: apiUrl);
       case 2:
         return AppLogsScreen();
+      case 3:
+        return BlogScreen(apiUrl: apiUrl, apiToken: _apiToken!);
       default:
         return const SizedBox.shrink();
     }
@@ -324,19 +330,20 @@ class _DomainDashboardState extends State<DomainDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('frii.site'),
+        title: Text(l10n.appBarTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _fetchDomains,
-            tooltip: 'Refresh Domains',
+            tooltip: l10n.refreshDomainsTooltip,
           ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: _showSettingsDialog,
-            tooltip: 'Settings',
+            tooltip: l10n.settingsTooltip,
           ),
         ],
       ),
@@ -355,34 +362,37 @@ class _DomainDashboardState extends State<DomainDashboard> {
             ),
             ListTile(
               leading: const Icon(Icons.dashboard),
-              title: const Text('Dashboard'),
+              title: Text(l10n.drawerDashboard),
               selected: _selectedPageIndex == 0,
               onTap: () {
-                setState(() {
-                  _selectedPageIndex = 0;
-                });
+                setState(() => _selectedPageIndex = 0);
                 Navigator.pop(context);
               },
             ),
             ListTile(
               leading: const Icon(Icons.account_circle),
-              title: const Text('Account'),
+              title: Text(l10n.drawerAccount),
               selected: _selectedPageIndex == 1,
               onTap: () {
-                setState(() {
-                  _selectedPageIndex = 1;
-                });
+                setState(() => _selectedPageIndex = 1);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.book),
+              title: Text(l10n.drawerBlogs),
+              selected: _selectedPageIndex == 3,
+              onTap: () {
+                setState(() => _selectedPageIndex = 3);
                 Navigator.pop(context);
               },
             ),
             ListTile(
               leading: const Icon(Icons.computer),
-              title: const Text('Logs'),
+              title: Text(l10n.drawerLogs),
               selected: _selectedPageIndex == 2,
               onTap: () {
-                setState(() {
-                  _selectedPageIndex = 2;
-                });
+                setState(() => _selectedPageIndex = 2);
                 Navigator.pop(context);
               },
             ),

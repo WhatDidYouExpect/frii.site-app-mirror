@@ -1,30 +1,35 @@
 import 'package:flutter/material.dart';
-import 'screens/dashboard_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
+import 'utils/language_manager.dart';
 import 'utils/theme_manager.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  ThemeData initialTheme = await loadSavedTheme();
-  appThemeNotifier.value = initialTheme;
-  print('Running main with theme applied');
-
-  // Run the app
-  runApp(const MyApp());
-}
+import 'screens/dashboard_screen.dart';
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeData>(
       valueListenable: appThemeNotifier,
       builder: (context, theme, _) {
-        print('Building MaterialApp with theme: ${theme.brightness}');
-        return MaterialApp(
-          title: 'Domain Dashboard',
-          theme: theme,
-          home: const DomainDashboard(),
+        return ValueListenableBuilder<Locale>(
+          valueListenable: appLocaleNotifier,
+          builder: (context, locale, _) {
+            return MaterialApp(
+              title: 'Domain Dashboard',
+              theme: theme,
+              locale: locale,
+              supportedLocales: AppLocalizations.supportedLocales,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              home: const DomainDashboard(),
+            );
+          },
         );
       },
     );

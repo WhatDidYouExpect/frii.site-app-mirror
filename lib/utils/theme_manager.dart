@@ -66,8 +66,8 @@ Future<ThemeData> loadSavedTheme() async {
       themeToApply = _halloweenTheme();
       print('No saved theme found, using Halloween theme');
     } else {
-      themeToApply = _materialDarkTheme();
-      print('No saved theme found, using Material Dark theme');
+      themeToApply = _materialBlueTheme();
+      print('No saved theme found, using Material Blue theme');
     }
   }
 

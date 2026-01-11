@@ -60,7 +60,7 @@
     "account": "Account",
     "logout": "Disconnetti",
     "name": "Nome",
-    "email": "Email",
+    "emailLabel": "Email",
     "lastLogin": "Ultimo accesso",
     "viewLogs": "Visualizza log",
     "failedLoadProfile": "Impossibile caricare il profilo",

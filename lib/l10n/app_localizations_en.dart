@@ -21,9 +21,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dontShowAgainButton => 'Don\'t show again';
 
   @override
-  String get emailLabel => 'Email';
-
-  @override
   String get languageLabel => 'Language';
 
   @override
@@ -97,10 +94,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourIpLabel => 'Your IP';
 
   @override
-  String get useYourIpButton => 'Use Your IP as Value';
-
-  @override
-  String get cancelButton => 'Cancel';
+  String get useYourIpButton => 'Update Domain to your IP';
 
   @override
   String get saveButton => 'Save';
@@ -156,6 +150,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerButton => 'Register';
 
   @override
+  String get cancelButton => 'Cancel';
+
+  @override
   String helloUser(Object name) {
     return 'Hello, $name!';
   }
@@ -197,7 +194,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get name => 'Name';
 
   @override
-  String get email => 'Email';
+  String get emailLabel => 'Email';
 
   @override
   String get lastLogin => 'Last Login';

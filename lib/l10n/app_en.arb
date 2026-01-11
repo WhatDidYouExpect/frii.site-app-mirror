@@ -60,7 +60,7 @@
     "account": "Account",
     "logout": "Logout",
     "name": "Name",
-    "email": "Email",
+    "emailLabel": "Email",
     "lastLogin": "Last Login",
     "viewLogs": "View Logs",
     "failedLoadProfile": "Failed to load profile",

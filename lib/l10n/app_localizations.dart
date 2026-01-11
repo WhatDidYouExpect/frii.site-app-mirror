@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_fi.dart';
 import 'app_localizations_it.dart';
 
 // ignore_for_file: type=lint
@@ -92,6 +93,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('fi'),
     Locale('it')
   ];
 
@@ -118,12 +120,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Don\'t show again'**
   String get dontShowAgainButton;
-
-  /// No description provided for @emailLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Email'**
-  String get emailLabel;
 
   /// No description provided for @languageLabel.
   ///
@@ -266,14 +262,8 @@ abstract class AppLocalizations {
   /// No description provided for @useYourIpButton.
   ///
   /// In en, this message translates to:
-  /// **'Use Your IP as Value'**
+  /// **'Update Domain to your IP'**
   String get useYourIpButton;
-
-  /// No description provided for @cancelButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancelButton;
 
   /// No description provided for @saveButton.
   ///
@@ -377,6 +367,12 @@ abstract class AppLocalizations {
   /// **'Register'**
   String get registerButton;
 
+  /// No description provided for @cancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButton;
+
   /// No description provided for @helloUser.
   ///
   /// In en, this message translates to:
@@ -455,11 +451,11 @@ abstract class AppLocalizations {
   /// **'Name'**
   String get name;
 
-  /// No description provided for @email.
+  /// No description provided for @emailLabel.
   ///
   /// In en, this message translates to:
   /// **'Email'**
-  String get email;
+  String get emailLabel;
 
   /// No description provided for @lastLogin.
   ///
@@ -561,7 +557,7 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'it'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'fi', 'it'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -573,6 +569,7 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'en': return AppLocalizationsEn();
+    case 'fi': return AppLocalizationsFi();
     case 'it': return AppLocalizationsIt();
   }
 

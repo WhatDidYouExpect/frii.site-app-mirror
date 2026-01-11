@@ -30,7 +30,7 @@ ThemeData _materialBlueTheme() => ThemeData(
         primary: Colors.blue,
         secondary: Colors.lightBlueAccent,
       ),
-      scaffoldBackgroundColor: const Color(0xFF121212),
+      scaffoldBackgroundColor: Colors.deepPurple,
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.blueAccent,
       ),
@@ -45,10 +45,34 @@ ThemeData _materialBlueTheme() => ThemeData(
       ),
     );
 
+ThemeData _materialPurpleTheme() => ThemeData(
+      brightness: Brightness.dark,
+      primarySwatch: Colors.deepPurple,
+      colorScheme: ColorScheme.dark(
+        primary: Colors.deepPurple,
+        secondary: Colors.lightBlueAccent,
+      ),
+      scaffoldBackgroundColor: const Color(0xFF121212),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.deepPurple,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+
+
 final Map<String, ThemeData> availableThemes = {
   'Material Dark': _materialDarkTheme(),
   'Halloween': _halloweenTheme(),
-  'Material Blue': _materialBlueTheme(),
+  'frii.site': _materialBlueTheme(),
+  'friii.site Purple': _materialPurpleTheme(),
 };
 
 Future<ThemeData> loadSavedTheme() async {

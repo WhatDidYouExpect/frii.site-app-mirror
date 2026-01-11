@@ -7,30 +7,53 @@ class ProfileCard extends StatelessWidget {
 
   const ProfileCard({super.key, required this.userData});
 
-  Widget _buildRow(String label, String value, {IconData? icon}) {
+  Widget _buildRow(
+    BuildContext context,
+    String label,
+    String value, {
+    IconData? icon,
+  }) {
+    final primary = Theme.of(context).colorScheme.primary;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (icon != null) Icon(icon, size: 20, color: Colors.blueAccent),
+          if (icon != null) Icon(icon, size: 20, color: primary),
           if (icon != null) const SizedBox(width: 8),
-          Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            '$label: ',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           Expanded(child: Text(value)),
         ],
       ),
     );
   }
 
-  Widget _buildInitialAvatar(String username) {
+  Widget _buildInitialAvatar(BuildContext context, String username) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
+
     final initials = username.isNotEmpty
-        ? username.trim().split(' ').map((e) => e[0].toUpperCase()).take(2).join()
+        ? username
+            .trim()
+            .split(' ')
+            .map((e) => e[0].toUpperCase())
+            .take(2)
+            .join()
         : '?';
+
     return CircleAvatar(
       radius: 24,
-      backgroundColor: const Color.fromRGBO(38, 143, 255, 1),
+      backgroundColor: primary,
       child: Text(
         initials,
-        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: onPrimary,
+        ),
       ),
     );
   }
@@ -41,10 +64,10 @@ class ProfileCard extends StatelessWidget {
 
     final country = userData['country'] ?? {};
     final permissions = userData['permissions'] ?? {};
-    final ownedTlds = (userData['owned-tlds'] as List<dynamic>?)?.join(', ') ?? l10n.none;
+    final ownedTlds =
+        (userData['owned-tlds'] as List<dynamic>?)?.join(', ') ?? l10n.none;
 
     return Card(
-      color: const Color(0xFF2A2A2A),
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -55,29 +78,67 @@ class ProfileCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                _buildInitialAvatar(userData['username'] ?? ''),
+                _buildInitialAvatar(context, userData['username'] ?? ''),
                 const SizedBox(width: 12),
                 Text(
                   userData['username'] ?? l10n.unknown,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            const Divider(color: Colors.white24, height: 20),
-            _buildRow(l10n.emailLabel, userData['email'] ?? l10n.notAvailable, icon: Icons.email),
-            _buildRow(l10n.languageLabel, userData['lang'] ?? l10n.notAvailable, icon: Icons.language),
-            _buildRow(l10n.cityLabel, country['city'] ?? l10n.notAvailable, icon: Icons.location_on),
-            _buildRow(l10n.countryLabel, country['country_name'] ?? l10n.notAvailable, icon: Icons.flag),
-            _buildRow(l10n.joinedLabel, formatDate(userData['created']), icon: Icons.calendar_today),
-            _buildRow(l10n.twoFaEnabledLabel, userData['mfa_enabled'] == true ? l10n.yes : l10n.no, icon: Icons.security),
-            _buildRow(l10n.referralCodeLabel, userData['referral-code'] ?? l10n.notAvailable, icon: Icons.code),
-            _buildRow(l10n.referredPeopleLabel, '${userData['referred-people'] ?? 0}', icon: Icons.people),
-            const Divider(color: Colors.white24, height: 20),
-            _buildRow(l10n.maxDomainsLabel, '${permissions['max-domains'] ?? 0}', icon: Icons.admin_panel_settings),
-            _buildRow(l10n.maxSubdomainsLabel, '${permissions['max-subdomains'] ?? 0}', icon: Icons.subdirectory_arrow_right),
-            _buildRow(l10n.userDetailsAccessLabel, '${permissions['userdetails'] ?? false}', icon: Icons.details),
-            _buildRow(l10n.ownedTldsLabel, ownedTlds, icon: Icons.language),
-            _buildRow(l10n.discordLinkedLabel, userData['discord-linked'] == true ? l10n.yes : l10n.no, icon: Icons.discord),
+
+            const Divider(height: 20),
+
+            _buildRow(context, l10n.emailLabel,
+                userData['email'] ?? l10n.notAvailable,
+                icon: Icons.email),
+            _buildRow(context, l10n.languageLabel,
+                userData['lang'] ?? l10n.notAvailable,
+                icon: Icons.language),
+            _buildRow(context, l10n.cityLabel,
+                country['city'] ?? l10n.notAvailable,
+                icon: Icons.location_on),
+            _buildRow(context, l10n.countryLabel,
+                country['country_name'] ?? l10n.notAvailable,
+                icon: Icons.flag),
+            _buildRow(context, l10n.joinedLabel,
+                formatDate(userData['created']),
+                icon: Icons.calendar_today),
+            _buildRow(
+              context,
+              l10n.twoFaEnabledLabel,
+              userData['mfa_enabled'] == true ? l10n.yes : l10n.no,
+              icon: Icons.security,
+            ),
+            _buildRow(context, l10n.referralCodeLabel,
+                userData['referral-code'] ?? l10n.notAvailable,
+                icon: Icons.code),
+            _buildRow(context, l10n.referredPeopleLabel,
+                '${userData['referred-people'] ?? 0}',
+                icon: Icons.people),
+
+            const Divider(height: 20),
+
+            _buildRow(context, l10n.maxDomainsLabel,
+                '${permissions['max-domains'] ?? 0}',
+                icon: Icons.admin_panel_settings),
+            _buildRow(context, l10n.maxSubdomainsLabel,
+                '${permissions['max-subdomains'] ?? 0}',
+                icon: Icons.subdirectory_arrow_right),
+            _buildRow(context, l10n.userDetailsAccessLabel,
+                '${permissions['userdetails'] ?? false}',
+                icon: Icons.details),
+            _buildRow(context, l10n.ownedTldsLabel, ownedTlds,
+                icon: Icons.language),
+            _buildRow(
+              context,
+              l10n.discordLinkedLabel,
+              userData['discord-linked'] == true ? l10n.yes : l10n.no,
+              icon: Icons.discord,
+            ),
           ],
         ),
       ),

@@ -27,7 +27,7 @@ class _BlogScreenState extends State<BlogScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Safe to use context and l10n here
+     // I was so wrong it shits itself for NO reason sometimes fix this jesus christ
     final l10n = AppLocalizations.of(context)!;
     _fetchBlogs(l10n);
   }
@@ -89,6 +89,7 @@ class _BlogScreenState extends State<BlogScreen> {
                   itemBuilder: (context, index) {
                     final post = _posts[index];
                     final isExpanded = _expanded.contains(index);
+                    final cardColor = Theme.of(context).cardColor;
 
                     return Card(
                       elevation: 3,
@@ -126,6 +127,7 @@ class _BlogScreenState extends State<BlogScreen> {
                                     ?.copyWith(color: Colors.grey),
                               ),
                               const SizedBox(height: 12),
+
                               AnimatedCrossFade(
                                 duration: const Duration(milliseconds: 250),
                                 crossFadeState: isExpanded
@@ -133,17 +135,45 @@ class _BlogScreenState extends State<BlogScreen> {
                                     : CrossFadeState.showFirst,
                                 firstChild: Text(
                                   _preview(post['body']),
-                                  style: Theme.of(context).textTheme.bodyMedium,
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium,
                                 ),
-                                secondChild: MarkdownBody(
-                                  data: post['body'],
-                                  styleSheet:
-                                      MarkdownStyleSheet.fromTheme(Theme.of(context)),
+
+                                secondChild: Container(
+                                  color: cardColor,
+                                  child: MarkdownBody(
+                                    data: post['body'],
+                                    styleSheet: MarkdownStyleSheet
+                                            .fromTheme(Theme.of(context))
+                                        .copyWith(
+                                      p: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                      blockquoteDecoration: BoxDecoration(
+                                        color: cardColor,
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                      ),
+                                      codeblockDecoration: BoxDecoration(
+                                        color: cardColor,
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                      ),
+                                      horizontalRuleDecoration:
+                                          BoxDecoration(color: cardColor),
+                                      tableBorder: TableBorder.all(
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
+
                               const SizedBox(height: 8),
                               Text(
-                                isExpanded ? l10n.blogCollapse : l10n.blogReadMore,
+                                isExpanded
+                                    ? l10n.blogCollapse
+                                    : l10n.blogReadMore,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall

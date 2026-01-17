@@ -16,7 +16,6 @@ jobs:
       ANDROID_SDK_ROOT: /android-sdk
       ANDROID_HOME: /android-sdk
       JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-      APK_OUTPUT: build/app/outputs/flutter-apk/app-release.apk
 
     steps:
       - name: Checkout
@@ -25,10 +24,7 @@ jobs:
       - name: Install system deps
         run: |
           apt-get update
-          apt-get install -y \
-            curl unzip zip git \
-            openjdk-17-jdk \
-            libglu1-mesa
+          apt-get install -y curl unzip zip git openjdk-17-jdk libglu1-mesa
 
       - name: Install Flutter
         run: |
@@ -36,45 +32,35 @@ jobs:
             -o flutter.tar.xz
           tar xf flutter.tar.xz
           mv flutter /flutter
+          git config --global --add safe.directory /flutter
           export PATH="/flutter/bin:$PATH"
           echo "/flutter/bin" >> $GITHUB_PATH
+
           flutter --version
 
       - name: Install Android SDK
         run: |
           mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          cd $ANDROID_SDK_ROOT
           curl -L https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
-            -o /tmp/cmdline-tools.zip
-          unzip /tmp/cmdline-tools.zip -d /tmp
-          rm -rf $ANDROID_SDK_ROOT/cmdline-tools/latest
-          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/latest
-          mv /tmp/cmdline-tools/* $ANDROID_SDK_ROOT/cmdline-tools/latest/
-
+            -o cmdline-tools.zip
+          unzip cmdline-tools.zip -d /tmp
+          mv /tmp/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
           export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
           echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
           sdkmanager --version
 
-      - name: Install SDK packages
+      - name: Install SDK packages & accept licenses
         run: |
           export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
-          sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses || true
-          sdkmanager --sdk_root=$ANDROID_SDK_ROOT \
-            "platform-tools" \
-            "platforms;android-34" \
-            "build-tools;34.0.0"
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Flutter doctor
         run: |
           export PATH="/flutter/bin:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
           flutter doctor -v
-
-      - name: Clean old APK
-        run: |
-          if [ -f "$APK_OUTPUT" ]; then
-            echo "Removing old APK..."
-            rm "$APK_OUTPUT"
-          fi
 
       - name: Build APK
         run: |
@@ -82,8 +68,8 @@ jobs:
           flutter pub get
           flutter build apk --release
 
-      - name: Upload APK Artifact
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v3
         with:
           name: app-release
-          path: $APK_OUTPUT
+          path: build/app/outputs/flutter-apk/app-release.apk

@@ -221,7 +221,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: selectedType,
+                initialValue: selectedType,
                 decoration: InputDecoration(
                   labelText: l10n.typeLabel,
                   border: const OutlineInputBorder(),

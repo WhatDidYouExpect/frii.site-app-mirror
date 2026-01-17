@@ -96,7 +96,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: selectedLanguage,
+              initialValue: selectedLanguage,
               decoration: InputDecoration(
                 labelText: l10n.selectLanguage,
                 border: const OutlineInputBorder(),
@@ -116,7 +116,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: selectedTheme,
+              initialValue: selectedTheme,
               decoration: const InputDecoration(
                 labelText: 'Select Theme',
                 border: OutlineInputBorder(),

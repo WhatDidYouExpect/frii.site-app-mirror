@@ -53,7 +53,7 @@ class DomainCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: selectedType,
+                initialValue: selectedType,
                 decoration: InputDecoration(
                   labelText: l10n.typeLabel,
                   border: const OutlineInputBorder(),

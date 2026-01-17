@@ -12,7 +12,7 @@ jobs:
       image: data.forgejo.org/oci/node:20-bullseye
 
     env:
-      FLUTTER_VERSION: "3.19.6"
+      FLUTTER_VERSION: "3.38.7"
       ANDROID_SDK_ROOT: /android-sdk
       ANDROID_HOME: /android-sdk
       JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64

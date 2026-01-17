@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-android:
-    runs-on: linux
+    runs-on: docker
 
     container:
       image: data.forgejo.org/oci/node:20-bullseye

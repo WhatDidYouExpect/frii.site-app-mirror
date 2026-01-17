@@ -30,7 +30,7 @@ ThemeData _materialBlueTheme() => ThemeData(
         primary: Colors.blue,
         secondary: Colors.lightBlueAccent,
       ),
-      scaffoldBackgroundColor: Colors.deepPurple,
+      scaffoldBackgroundColor: const Color(0xFF121212),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.blueAccent,
       ),

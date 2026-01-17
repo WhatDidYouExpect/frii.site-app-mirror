@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-android:
-    runs-on: [openmediavault.local, android, flutter]
+    runs-on: [docker]
 
     env:
       FLUTTER_VERSION: "3.19.6"

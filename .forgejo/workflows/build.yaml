@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-android:
-    runs-on: docker
+    runs-on: linux
 
     container:
       image: data.forgejo.org/oci/node:20-bullseye
@@ -15,6 +15,7 @@ jobs:
       FLUTTER_VERSION: "3.19.6"
       ANDROID_SDK_ROOT: /android-sdk
       ANDROID_HOME: /android-sdk
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
 
     steps:
       - name: Checkout
@@ -32,9 +33,13 @@ jobs:
         run: |
           curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz \
             -o flutter.tar.xz
+
           tar xf flutter.tar.xz
-          echo "/flutter/bin" >> $GITHUB_PATH
           mv flutter /flutter
+
+          export PATH="/flutter/bin:$PATH"
+          echo "/flutter/bin" >> $GITHUB_PATH
+
           flutter --version
 
       - name: Install Android SDK
@@ -48,21 +53,31 @@ jobs:
           unzip cmdline-tools.zip
           mv cmdline-tools cmdline-tools/latest
 
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
           echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
 
+          sdkmanager --version
+
       - name: Install SDK packages
         run: |
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
+
           yes | sdkmanager --licenses
+
           sdkmanager \
             "platform-tools" \
             "platforms;android-34" \
             "build-tools;34.0.0"
 
       - name: Flutter doctor
-        run: flutter doctor -v
+        run: |
+          export PATH="/flutter/bin:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
+          flutter doctor -v
 
       - name: Build APK
         run: |
+          export PATH="/flutter/bin:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
+
           flutter pub get
           flutter build apk --release

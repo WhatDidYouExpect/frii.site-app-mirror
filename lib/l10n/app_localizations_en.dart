@@ -9,6 +9,15 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get apiPopupTitle => 'First launch';
+
+  @override
+  String get apiPopupText => 'API key not set. Please configure it in the settings and grant all permissions.';
+
+  @override
+  String get apiPopupButton => 'Get API key';
+
+  @override
   String get donationPopupTitle => 'Have you considered donating?';
 
   @override

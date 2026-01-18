@@ -9,6 +9,15 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
+  String get apiPopupTitle => 'Primo avvio';
+
+  @override
+  String get apiPopupText => 'Chiave API non impostata. Configurala nelle impostazioni e concedi tutte le autorizzazioni.';
+
+  @override
+  String get apiPopupButton => 'Ottieni chiave API';
+
+  @override
   String get donationPopupTitle => 'Hai pensato di fare una donazione?';
 
   @override

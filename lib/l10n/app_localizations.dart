@@ -97,6 +97,24 @@ abstract class AppLocalizations {
     Locale('it')
   ];
 
+  /// No description provided for @apiPopupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First launch'**
+  String get apiPopupTitle;
+
+  /// No description provided for @apiPopupText.
+  ///
+  /// In en, this message translates to:
+  /// **'API key not set. Please configure it in the settings and grant all permissions.'**
+  String get apiPopupText;
+
+  /// No description provided for @apiPopupButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Get API key'**
+  String get apiPopupButton;
+
   /// No description provided for @donationPopupTitle.
   ///
   /// In en, this message translates to:

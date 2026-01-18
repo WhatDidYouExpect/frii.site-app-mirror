@@ -1,4 +1,7 @@
 {
+    "apiPopupTitle": "Primo avvio",
+    "apiPopupText": "Chiave API non impostata. Configurala nelle impostazioni e concedi tutte le autorizzazioni.",
+    "apiPopupButton": "Ottieni chiave API",
     "donationPopupTitle": "Hai pensato di fare una donazione?",
     "donationPopupText": "frii.site non è mai stato redditizio, ma a causa dell'aumento dei prezzi del nostro dominio da parte di Namecheap, stiamo perdendo più soldi che mai. Anche piccole donazioni (ad esempio €1 o 1 Fr.) sarebbero di grande aiuto.",
     "donationPopupButton": "Vedi le opzioni di donazione",

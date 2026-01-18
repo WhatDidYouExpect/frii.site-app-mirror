@@ -9,6 +9,15 @@ class AppLocalizationsFi extends AppLocalizations {
   AppLocalizationsFi([String locale = 'fi']) : super(locale);
 
   @override
+  String get apiPopupTitle => 'First launch';
+
+  @override
+  String get apiPopupText => 'API key not set. Please configure it in the settings and grant all permissions.';
+
+  @override
+  String get apiPopupButton => 'Get API key';
+
+  @override
   String get donationPopupTitle => 'Oletko harkinnut lahjoitusta?';
 
   @override

@@ -21,6 +21,7 @@ class DomainDashboard extends StatefulWidget {
 
 class _DomainDashboardState extends State<DomainDashboard> {
   final String _donationPopupKey = 'donation_popup_shown';
+  final String _ApiKey = 'donation_popup_shown';
   String? _apiToken;
   String? _name;
   String apiUrl = 'https://beta.frii.site';
@@ -33,7 +34,8 @@ class _DomainDashboardState extends State<DomainDashboard> {
   void initState() {
     super.initState();
     _loadSettings();
-    _showDonationPopupOnce();
+    _showApiAlert();
+    //_showDonationPopupOnce();
   }
 
 
@@ -49,6 +51,34 @@ class _DomainDashboardState extends State<DomainDashboard> {
       await _fetchUserProfile();
       _fetchDomains();
     }
+  }
+
+  Future<void> _showApiAlert() async {
+    final prefs = await SharedPreferences.getInstance();
+    final shown = prefs.getBool(_ApiKey) ?? false;
+    if (shown) return;
+
+    final l10n = AppLocalizations.of(context)!;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (context) => ConfigurablePopup(
+          title: l10n.apiPopupTitle,
+          text: l10n.apiPopupText,
+          links: {l10n.apiPopupButton: 'https://canary.frii.site/it/api/dashboard'},
+          extraActions: [
+            TextButton(
+              onPressed: () async {
+                await prefs.setBool(_ApiKey, true);
+                Navigator.of(context).pop();
+              },
+              child: Text(l10n.dontShowAgainButton),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Future<void> _showDonationPopupOnce() async {

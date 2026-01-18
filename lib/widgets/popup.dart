@@ -69,7 +69,7 @@ class ConfigurablePopup extends StatelessWidget {
   void _launchURL(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       debugPrint('Could not launch $url');
     }
@@ -79,24 +79,18 @@ class ConfigurablePopup extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(title),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(text),
-          const SizedBox(height: 16),
-          ...links.entries.map(
-            (entry) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: ElevatedButton(
-                onPressed: () => _launchURL(entry.value),
-                child: Text(entry.key),
-              ),
-            ),
-          ),
-        ],
-      ),
+      content: Text(text),
       actions: [
-        ...?extraActions, // include extra actions if provided
+        // material youing it so hard rn
+        ...links.entries.map(
+          (entry) => TextButton(
+            onPressed: () => _launchURL(entry.value),
+            child: Text(entry.key),
+          ),
+        ),
+
+        ...?extraActions,
+
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Close'),

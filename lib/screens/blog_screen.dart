@@ -6,12 +6,9 @@ import '../l10n/app_localizations.dart';
 
 class BlogScreen extends StatefulWidget {
   final String apiUrl;
-  final String apiToken;
-
   const BlogScreen({
     super.key,
     required this.apiUrl,
-    required this.apiToken,
   });
 
   @override

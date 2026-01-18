@@ -22,7 +22,7 @@ class DomainDashboard extends StatefulWidget {
 class _DomainDashboardState extends State<DomainDashboard> {
   final String _donationPopupKey = 'donation_popup_shown';
   final String _ApiKey = 'donation_popup_shown';
-  String? _apiToken;
+  String _apiToken = '';
   String? _name;
   String apiUrl = 'https://beta.frii.site';
   Map<String, dynamic>? _domains;
@@ -42,7 +42,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _apiToken = prefs.getString('api_token');
+      _apiToken = prefs.getString('api_token') ?? '';
       apiUrl = prefs.getString('api_url') ?? apiUrl;
       _name = prefs.getString('username');
     });
@@ -386,7 +386,7 @@ class _DomainDashboardState extends State<DomainDashboard> {
       case 2:
         return AppLogsScreen();
       case 3:
-        return BlogScreen(apiUrl: apiUrl, apiToken: _apiToken!);
+        return BlogScreen(apiUrl: apiUrl);
       default:
         return const SizedBox.shrink();
     }

@@ -23,32 +23,60 @@ class _AccountScreenState extends State<AccountScreen> {
     _fetchUserProfile();
   }
 
-  Future<void> _fetchUserProfile() async {
-    if (widget.apiToken.isEmpty) return;
-    try {
-      final response = await http.get(
-        Uri.parse('${widget.apiUrl}/api/user'),
-        headers: {
-          'X-API-Token': widget.apiToken,
-          'Accept': 'application/json',
-        },
-      );
-      if (response.statusCode == 200) {
+Future<void> _fetchUserProfile() async {
+      if (widget.apiToken.isEmpty) {
         setState(() {
-          _userProfile = jsonDecode(response.body);
-          _loading = false;
-        });
-      } else {
-        print('Failed to fetch user: ${response.statusCode}');
-        LogPrint('Failed to fetch user: ${response.statusCode}');  
-        setState(() => _loading = false);
-      }
-    } catch (e) {
-      print('Error fetching user profile: $e');
-      LogPrint('Error fetching user profile: $e');
+          _userProfile = {
+      'username': 'Mario Rossi',
+      'email': 'mario.rossi@libero.it',
+      'lang': 'it-it',
+      'created': '2024-01-01',
+      'mfa_enabled': false,
+      'referral-code': 'THISISNTAREALUSER',
+      'referred-people': 999,
+      'discord-linked': false,
+      'owned-tlds': [],
+      'country': {
+        'city': 'Siracusa',
+        'country_name': 'Italia',
+      },
+      'permissions': {
+        'max-domains': 1,
+        'max-subdomains': 5,
+        'userdetails': false,
+      },
+    };
+      _loading = false;
+    });
+    return;
+  }
+
+  try {
+    final response = await http.get(
+      Uri.parse('${widget.apiUrl}/api/user'),
+      headers: {
+        'X-API-Token': widget.apiToken,
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        _userProfile = jsonDecode(response.body);
+        _loading = false;
+      });
+    } else {
+      print('Failed to fetch user: ${response.statusCode}');
+      LogPrint('Failed to fetch user: ${response.statusCode}');
       setState(() => _loading = false);
     }
+  } catch (e) {
+    print('Error fetching user profile: $e');
+    LogPrint('Error fetching user profile: $e');
+    setState(() => _loading = false);
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

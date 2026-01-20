@@ -101,12 +101,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 labelText: l10n.selectLanguage,
                 border: const OutlineInputBorder(),
               ),
-              items: AppLocalizations.supportedLocales
-                  .map((locale) => DropdownMenuItem(
+                items: AppLocalizations.supportedLocales
+                    .map(
+                      (locale) => DropdownMenuItem(
                         value: locale.languageCode,
-                        child: Text(locale.languageCode.toUpperCase()),
-                      ))
-                  .toList(),
+                        child: Text(
+                          locale.languageCode == 'fr'
+                              ? 'PIRATE'
+                              : locale.languageCode.toUpperCase(),
+                        ),
+                      ),
+                    )
+                    .toList(),
               onChanged: (value) async {
                 if (value != null) {
                   await setAppLocale(value);

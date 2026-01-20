@@ -16,43 +16,71 @@ class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-            ),
-            child: Text(
-              username ?? 'User',
-              style: const TextStyle(color: Colors.white, fontSize: 24),
-            ),
-          ),
-          _item(context, Icons.dashboard, l10n.drawerDashboard, 0),
-          _item(context, Icons.account_circle, l10n.drawerAccount, 1),
-          _item(context, Icons.book, l10n.drawerBlogs, 3),
-          _item(context, Icons.computer, l10n.drawerLogs, 2),
-        ],
-      ),
-    );
-  }
-
-  Widget _item(
-    BuildContext context,
-    IconData icon,
-    String title,
-    int index,
-  ) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      selected: selectedIndex == index,
-      onTap: () {
+    return NavigationDrawer(
+      selectedIndex: selectedIndex,
+      backgroundColor: colorScheme.surface,
+      indicatorColor: colorScheme.primaryContainer,
+      onDestinationSelected: (index) {
         onSelect(index);
         Navigator.pop(context);
       },
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(30, 24, 16, 16),
+          child: Text(
+            username ?? 'User',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                ),
+          ),
+        ),
+        Divider(color: colorScheme.outlineVariant),
+        _destination(
+          icon: Icons.dashboard_outlined,
+          selectedIcon: Icons.dashboard,
+          label: l10n.drawerDashboard,
+        ),
+        _destination(
+          icon: Icons.account_circle_outlined,
+          selectedIcon: Icons.account_circle,
+          label: l10n.drawerAccount,
+        ),
+        _destination(
+          icon: Icons.computer_outlined,
+          selectedIcon: Icons.computer,
+          label: l10n.drawerLogs,
+        ),
+        _destination(
+          icon: Icons.book_outlined,
+          selectedIcon: Icons.book,
+          label: l10n.drawerBlogs,
+        ),
+      ],
+    );
+  }
+
+  NavigationDrawerDestination _destination({
+    required IconData icon,
+    required IconData selectedIcon,
+    required String label,
+  }) {
+    return NavigationDrawerDestination(
+      icon: Icon(
+        icon,
+        color: Colors.white,
+      ),
+      selectedIcon: Icon(
+        selectedIcon,
+        color: Colors.white,
+      ),
+      label: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }
